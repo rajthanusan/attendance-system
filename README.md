@@ -10,6 +10,10 @@ This project implements a complete school attendance management system with secu
 - **Build Tool**: Maven
 - **Styling**: Pure CSS (No frameworks)
 
+## Screenshots
+[Login Screen](client/docs/login.png)
+[Home Screen](client/docs/home.png)
+
 ## Setup Instructions
 ```bash
 # 1. Clone the repository
@@ -26,6 +30,4 @@ Enter the following username and password on the login page:
 username:admin
 password:password123
 
-## Screenshots
-[Login Screen](client/docs/login.png)
-[Home Screen](client/docs/home.png)
+
