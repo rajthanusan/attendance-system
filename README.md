@@ -11,8 +11,8 @@ This project implements a complete school attendance management system with secu
 - **Styling**: Pure CSS (No frameworks)
 
 ## Screenshots
-[Login Screen](client/docs/login.png)
-[Home Screen](client/docs/home.png)
+[Login Screen](docs/login.png)
+[Home Screen](docs/home.png)
 
 ## Setup Instructions
 ```bash
