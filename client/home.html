@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Attendance System - Home</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="icon" type="image/png" href="logo.png" />
+    <style>
+      :root {
+        --primary: #4361ee;
+        --primary-dark: #3a56d4;
+        --danger: #f72585;
+        --success: #4cc9f0;
+        --gray: #adb5bd;
+        --dark: #212529;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      .logo {
+        width: 100px;
+        height: auto;
+        margin-top: 10px;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f8f9fa;
+        margin: 0;
+        color: var(--dark);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      h1 {
+        color: var(--primary);
+        font-weight: 600;
+      }
+
+      .welcome-message {
+        font-size: 1.2rem;
+        color: var(--dark);
+      }
+
+      .logout-btn {
+        padding: 0.5rem 1rem;
+        background-color: var(--danger);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .logout-btn:hover {
+        background-color: #e5177e;
+      }
+
+      .attendance-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+      }
+
+      .attendance-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .attendance-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--dark);
+      }
+
+      .attendance-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .attendance-table th {
+        background-color: #f1f3f5;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 500;
+      }
+
+      .attendance-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .attendance-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .present {
+        color: #2b8a3e;
+        font-weight: 500;
+      }
+
+      .absent {
+        color: #c92a2a;
+        font-weight: 500;
+      }
+
+      .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(67, 97, 238, 0.2);
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error-message {
+        color: var(--danger);
+        text-align: center;
+        padding: 1rem;
+        background-color: #fff5f5;
+        border-radius: 6px;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div>
+          <h1>Attendance System</h1>
+          <div class="welcome-message" id="welcomeMessage">Welcome, User</div>
+        </div>
+        <button class="logout-btn" id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </header>
+
+      <div class="attendance-container">
+        <div class="attendance-header">
+          <h2 class="attendance-title">Student Attendance</h2>
+        </div>
+
+        <div id="loadingContainer" class="loading-container">
+          <div class="spinner"></div>
+        </div>
+
+        <div id="attendanceData" style="display: none">
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceTableBody"></tbody>
+          </table>
+        </div>
+
+        <div
+          id="errorContainer"
+          class="error-message"
+          style="display: none"
+        ></div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const token = localStorage.getItem("attendance_system_token");
+        if (!token) {
+          window.location.href = "login.html";
+          return;
+        }
+
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+          localStorage.removeItem("attendance_system_token");
+          window.location.href = "login.html";
+        });
+
+        const username = "Admin";
+        document.getElementById(
+          "welcomeMessage"
+        ).textContent = `Welcome, ${username}`;
+
+        loadAttendanceData();
+      });
+
+      const dummyAttendanceData = [
+        {
+          id: 1,
+          studentId: "S001",
+          name: "John Doe",
+          date: "2023-05-01",
+          status: "Present",
+        },
+        {
+          id: 2,
+          studentId: "S002",
+          name: "Jane Smith",
+          date: "2023-05-01",
+          status: "Present",
+        },
+        {
+          id: 3,
+          studentId: "S003",
+          name: "Michael Johnson",
+          date: "2023-05-01",
+          status: "Absent",
+        },
+        {
+          id: 4,
+          studentId: "S004",
+          name: "Emily Davis",
+          date: "2023-05-01",
+          status: "Present",
+        },
+        {
+          id: 5,
+          studentId: "S005",
+          name: "Robert Wilson",
+          date: "2023-05-01",
+          status: "Present",
+        },
+      ];
+
+      function loadAttendanceData() {
+        setTimeout(() => {
+          document.getElementById("loadingContainer").style.display = "none";
+          try {
+            const data = dummyAttendanceData;
+
+            renderAttendanceData(data);
+            document.getElementById("attendanceData").style.display = "block";
+          } catch (error) {
+            console.error("Error loading attendance:", error);
+            document.getElementById("errorContainer").textContent =
+              "Failed to load attendance data";
+            document.getElementById("errorContainer").style.display = "block";
+          }
+        }, 1500);
+      }
+
+      function renderAttendanceData(data) {
+        const tableBody = document.getElementById("attendanceTableBody");
+        tableBody.innerHTML = "";
+
+        data.forEach((record) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+                    <td>${record.studentId}</td>
+                    <td>${record.name}</td>
+                    <td>${record.date}</td>
+                    <td class="${record.status.toLowerCase()}">${
+            record.status
+          }</td>
+                `;
+
+          tableBody.appendChild(row);
+        });
+      }
+    </script>
+  </body>
+</html>
