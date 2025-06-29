@@ -33,14 +33,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for API
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) 
+                .csrf(AbstractHttpConfigurer::disable) 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Public endpoints
-                        .anyRequest().authenticated() // All other endpoints require auth
+                        .requestMatchers("/api/auth/**").permitAll() 
+                        .anyRequest().authenticated() 
                 )
-                .formLogin(AbstractHttpConfigurer::disable) // Disable form login
-                .httpBasic(AbstractHttpConfigurer::disable); // Disable basic auth
+                .formLogin(AbstractHttpConfigurer::disable) 
+                .httpBasic(AbstractHttpConfigurer::disable); 
 
         return http.build();
     }
@@ -48,7 +48,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); // Allow all origins (adjust for production)
+        configuration.setAllowedOrigins(Arrays.asList("*")); 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
